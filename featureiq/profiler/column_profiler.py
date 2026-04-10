@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import numpy as np
 import pandas as pd
 from pydantic import BaseModel
 from scipy import stats
 
 from featureiq.exceptions import ProfilingError
 from featureiq.utils.validation import (
-    HIGH_CARDINALITY_THRESHOLD,
     LOW_CARDINALITY_MAX,
     MEDIUM_CARDINALITY_MAX,
     MISSING_THRESHOLD,
@@ -191,12 +189,16 @@ def profile_datetime_column(series: pd.Series) -> dict:
     is_monotonic = bool(clean.is_monotonic_increasing or clean.is_monotonic_decreasing)
 
     diffs = clean_sorted.diff().dropna()
-    if len(diffs) == 0:  # pragma: no cover – defensive guard; unreachable when len(clean) >= 2
+    if (
+        len(diffs) == 0
+    ):  # pragma: no cover – defensive guard; unreachable when len(clean) >= 2
         return {"is_monotonic": is_monotonic, "has_regular_frequency": True}
 
     median_delta = diffs.median()
     mode_result = diffs.mode()
-    if len(mode_result) == 0:  # pragma: no cover – defensive guard; mode() on non-empty always returns ≥1
+    if (
+        len(mode_result) == 0
+    ):  # pragma: no cover – defensive guard; mode() on non-empty always returns ≥1
         has_regular_frequency = True
     else:
         mode_delta = mode_result.iloc[0]
@@ -259,9 +261,7 @@ def profile_column(series: pd.Series, name: str) -> ColumnProfile:
     except ProfilingError:
         raise
     except Exception as exc:
-        raise ProfilingError(
-            f"Failed to profile column '{name}': {exc}"
-        ) from exc
+        raise ProfilingError(f"Failed to profile column '{name}': {exc}") from exc
 
     return ColumnProfile(
         name=name,

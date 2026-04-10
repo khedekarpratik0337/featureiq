@@ -8,72 +8,90 @@ from typing import Any
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-from featureiq.exceptions import TransformerError
 from featureiq.ontology.rule_loader import OntologyRule
 from featureiq.profiler.dataset_profiler import DatasetProfile
 from featureiq.transformer.registry import get_transformer
-from featureiq.utils.validation import ColumnType
 
-_DATE_EXTRACTION_TRANSFORMS = frozenset({
-    "date_component_extractor",
-    "time_since_reference",
-})
+_DATE_EXTRACTION_TRANSFORMS = frozenset(
+    {
+        "date_component_extractor",
+        "time_since_reference",
+    }
+)
 
-_IMPUTATION_TRANSFORMS = frozenset({
-    "mean_imputer",
-    "median_imputer",
-    "mode_imputer",
-})
+_IMPUTATION_TRANSFORMS = frozenset(
+    {
+        "mean_imputer",
+        "median_imputer",
+        "mode_imputer",
+    }
+)
 
-_CLIPPING_TRANSFORMS = frozenset({
-    "iqr_clipper",
-})
+_CLIPPING_TRANSFORMS = frozenset(
+    {
+        "iqr_clipper",
+    }
+)
 
-_NONLINEAR_TRANSFORMS = frozenset({
-    "log_transform",
-    "differencing",
-})
+_NONLINEAR_TRANSFORMS = frozenset(
+    {
+        "log_transform",
+        "differencing",
+    }
+)
 
-_SCALING_TRANSFORMS = frozenset({
-    "standard_scaler",
-    "min_max_scaler",
-    "robust_scaler",
-})
+_SCALING_TRANSFORMS = frozenset(
+    {
+        "standard_scaler",
+        "min_max_scaler",
+        "robust_scaler",
+    }
+)
 
-_ENCODING_TRANSFORMS = frozenset({
-    "one_hot_encoder",
-    "ordinal_encoder",
-    "target_encoder",
-    "binary_encoder",
-    "rare_label_grouper",
-})
+_ENCODING_TRANSFORMS = frozenset(
+    {
+        "one_hot_encoder",
+        "ordinal_encoder",
+        "target_encoder",
+        "binary_encoder",
+        "rare_label_grouper",
+    }
+)
 
-_EXPANSION_TRANSFORMS = frozenset({
-    "polynomial_features",
-    "fourier_features",
-})
+_EXPANSION_TRANSFORMS = frozenset(
+    {
+        "polynomial_features",
+        "fourier_features",
+    }
+)
 
-_TEMPORAL_TRANSFORMS = frozenset({
-    "lag_feature_generator",
-    "rolling_stats_generator",
-})
+_TEMPORAL_TRANSFORMS = frozenset(
+    {
+        "lag_feature_generator",
+        "rolling_stats_generator",
+    }
+)
 
-_SKIP_IN_COLUMN_TRANSFORMER = frozenset({
-    "class_weight_balancing",
-    "stratified_sampling",
-    "contamination_calibration",
-    "lag_feature_generator",
-    "rolling_stats_generator",
-    "differencing",
-    "fourier_features",
-})
+_SKIP_IN_COLUMN_TRANSFORMER = frozenset(
+    {
+        "class_weight_balancing",
+        "stratified_sampling",
+        "contamination_calibration",
+        "lag_feature_generator",
+        "rolling_stats_generator",
+        "differencing",
+        "fourier_features",
+    }
+)
 
-_POST_CT_TRANSFORMS = frozenset({
-    "lag_feature_generator",
-    "rolling_stats_generator",
-    "differencing",
-    "fourier_features",
-})
+_POST_CT_TRANSFORMS = frozenset(
+    {
+        "lag_feature_generator",
+        "rolling_stats_generator",
+        "differencing",
+        "fourier_features",
+    }
+)
 
 _STEP_ORDER = [
     _DATE_EXTRACTION_TRANSFORMS,
@@ -98,7 +116,8 @@ def _step_priority(transformation: str) -> int:
 def _prioritise_rules(
     rules: list[OntologyRule],
 ) -> list[OntologyRule]:
-    """Order rules: imputation -> clipping -> nonlinear -> scaling -> encoding -> expansion.
+    """Order rules: imputation -> clipping -> nonlinear -> scaling ->
+    encoding -> expansion.
 
     Deduplicates by transformation name, keeping highest confidence.
     """
@@ -113,7 +132,7 @@ def _prioritise_rules(
 
 
 def _has_imputation_step(steps: list[tuple[str, Any]]) -> bool:
-    """Check whether a list of pipeline steps already contains an imputation transform."""
+    """Check whether pipeline steps already contain an imputation transform."""
     for step_name, _ in steps:
         if step_name in _IMPUTATION_TRANSFORMS:
             return True
@@ -152,7 +171,6 @@ def build_column_transformer(
     """
     from featureiq.utils.validation import ColumnType as CT
 
-    transformer_groups: dict[str, tuple[Any, list[str]]] = {}
     col_step_map: dict[str, list[tuple[str, Any]]] = defaultdict(list)
 
     for col_name, rules in recommendations.items():
@@ -173,8 +191,13 @@ def build_column_transformer(
         cp = dataset_profile.column_profiles.get(col_name)
         if cp is None:
             continue
-        if cp.raw_has_missing and cp.column_type == CT.NUMERICAL and not _has_imputation_step(steps):
+        if (
+            cp.raw_has_missing
+            and cp.column_type == CT.NUMERICAL
+            and not _has_imputation_step(steps)
+        ):
             from sklearn.impute import SimpleImputer
+
             safety_imputer = SimpleImputer(strategy="median")
             steps.insert(0, ("_safety_median_imputer", safety_imputer))
             col_step_map[col_name] = steps
@@ -217,7 +240,7 @@ def build_column_transformer(
 def _collect_post_ct_transforms(
     recommendations: dict[str, list[OntologyRule]],
 ) -> list[tuple[str, Any]]:
-    """Collect transforms that run after the ColumnTransformer (row-wise temporal ops)."""
+    """Collect transforms after ColumnTransformer (row-wise temporal ops)."""
     seen: set[str] = set()
     post_steps: list[tuple[str, Any]] = []
 
@@ -225,7 +248,10 @@ def _collect_post_ct_transforms(
         if col_name == "__dataset__":
             continue
         for rule in rules:
-            if rule.transformation in _POST_CT_TRANSFORMS and rule.transformation not in seen:
+            if (
+                rule.transformation in _POST_CT_TRANSFORMS
+                and rule.transformation not in seen
+            ):
                 seen.add(rule.transformation)
                 spec = get_transformer(rule.transformation)
                 transformer = spec.transformer_class(**spec.default_kwargs)

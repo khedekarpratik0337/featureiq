@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import tempfile
 
 import pytest
 
@@ -40,15 +39,9 @@ class TestLoadRulesFromYaml:
         with pytest.raises(OntologyError, match="no 'rules' key"):
             load_rules_from_yaml(str(empty))
 
-    def test_invalid_rule_schema_raises_rule_validation_error(
-        self, tmp_path
-    ) -> None:
+    def test_invalid_rule_schema_raises_rule_validation_error(self, tmp_path) -> None:
         invalid_schema = tmp_path / "invalid.yaml"
-        invalid_schema.write_text(
-            "rules:\n"
-            "  - id: 123\n"
-            "    description: null\n"
-        )
+        invalid_schema.write_text("rules:\n" "  - id: 123\n" "    description: null\n")
         with pytest.raises(RuleValidationError, match="Validation failed"):
             load_rules_from_yaml(str(invalid_schema))
 

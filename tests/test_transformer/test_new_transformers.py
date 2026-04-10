@@ -1,4 +1,4 @@
-"""Tests for new transformers: Differencing, Fourier, TimeSinceReference, and registry."""
+"""Tests for Differencing, Fourier, TimeSinceReference transformers and registry."""
 
 from __future__ import annotations
 
@@ -26,10 +26,12 @@ class TestDifferencingTransformer:
         assert (result["val"].iloc[1:] == 1.0).all()
 
     def test_preserves_non_target_columns(self) -> None:
-        df = pd.DataFrame({
-            "val": list(range(1, 21)),
-            "other": list(range(100, 120)),
-        })
+        df = pd.DataFrame(
+            {
+                "val": list(range(1, 21)),
+                "other": list(range(100, 120)),
+            }
+        )
         t = DifferencingTransformer(variables=["val"])
         t.fit(df)
         result = t.transform(df)
@@ -63,9 +65,11 @@ class TestTimeSinceReferenceTransformer:
     """Tests for TimeSinceReferenceTransformer."""
 
     def test_days_since_reference(self) -> None:
-        df = pd.DataFrame({
-            "dt": pd.date_range("2020-01-01", periods=10, freq="D"),
-        })
+        df = pd.DataFrame(
+            {
+                "dt": pd.date_range("2020-01-01", periods=10, freq="D"),
+            }
+        )
         t = TimeSinceReferenceTransformer(variables=["dt"], unit="days")
         t.fit(df)
         result = t.transform(df)
@@ -74,9 +78,11 @@ class TestTimeSinceReferenceTransformer:
         assert result["dt_days_since_ref"].iloc[1] == pytest.approx(1.0)
 
     def test_drops_original_column(self) -> None:
-        df = pd.DataFrame({
-            "dt": pd.date_range("2020-01-01", periods=10, freq="D"),
-        })
+        df = pd.DataFrame(
+            {
+                "dt": pd.date_range("2020-01-01", periods=10, freq="D"),
+            }
+        )
         t = TimeSinceReferenceTransformer(variables=["dt"], unit="days")
         t.fit(df)
         result = t.transform(df)

@@ -12,7 +12,6 @@ from sklearn.pipeline import Pipeline
 
 from featureiq.exceptions import (
     FeatureIQError,
-    InsufficientDataError,
     UnsupportedAlgorithmError,
     UnsupportedProblemTypeError,
 )
@@ -174,11 +173,17 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         )
 
         self._used_meta_learner = False
-        if y is not None and self.use_meta_learner and len(X) >= MIN_ROWS_FOR_META_LEARNING:
+        if (
+            y is not None
+            and self.use_meta_learner
+            and len(X) >= MIN_ROWS_FOR_META_LEARNING
+        ):
             try:
                 ml = MetaLearner(model_path=self.meta_learner_path)
                 if ml.is_fitted:
-                    meta_vec = build_meta_feature_vector(self.profile_, pt, self.algorithm)
+                    meta_vec = build_meta_feature_vector(
+                        self.profile_, pt, self.algorithm
+                    )
                     candidate_transforms = set()
                     for rules in self.recommendations_.values():
                         for rule in rules:
@@ -203,7 +208,9 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             except Exception:
                 logger.debug("MetaLearner not available, using ontology-only fallback.")
 
-        if not self._used_meta_learner and self.recommendations_ is None:  # pragma: no cover
+        if (
+            not self._used_meta_learner and self.recommendations_ is None
+        ):  # pragma: no cover
             self.recommendations_ = ontology_only_recommend(
                 self.profile_, af, pt, engine
             )
@@ -216,27 +223,31 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             for col, transform_names in self.override_transforms.items():
                 override_rules = []
                 for t_name in transform_names:
-                    spec = get_transformer(t_name)
-                    override_rules.append(OntologyRule(
-                        id=f"OVERRIDE_{col}_{t_name}",
-                        description=f"User override: {t_name} for {col}",
-                        version="1.0",
-                        conditions={},
-                        algorithm_families=[af],
-                        transformation=t_name,
-                        contraindicated_for=[],
-                        confidence=1.0,
-                        source="user_override",
-                        tags=["override"],
-                    ))
+                    get_transformer(t_name)
+                    override_rules.append(
+                        OntologyRule(
+                            id=f"OVERRIDE_{col}_{t_name}",
+                            description=f"User override: {t_name} for {col}",
+                            version="1.0",
+                            conditions={},
+                            algorithm_families=[af],
+                            transformation=t_name,
+                            contraindicated_for=[],
+                            confidence=1.0,
+                            source="user_override",
+                            tags=["override"],
+                        )
+                    )
                 self.recommendations_[col] = override_rules
 
         pre_steps = list(self.pre_transforms) if self.pre_transforms else None
         post_steps = list(self.post_transforms) if self.post_transforms else None
 
         self.pipeline_ = build_pipeline(
-            self.recommendations_, self.profile_,
-            pre_steps=pre_steps, post_steps=post_steps,
+            self.recommendations_,
+            self.profile_,
+            pre_steps=pre_steps,
+            post_steps=post_steps,
         )
         self.pipeline_.fit(X, y)
         self.is_fitted_ = True
@@ -259,9 +270,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             FeatureIQError: If called before fit().
         """
         if not self.is_fitted_:
-            raise FeatureIQError(
-                "FeatureIQ has not been fitted. Call fit() first."
-            )
+            raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
@@ -279,9 +288,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             FeatureIQError: If called before fit().
         """
         if not self.is_fitted_ or self.recommendations_ is None:
-            raise FeatureIQError(
-                "FeatureIQ has not been fitted. Call fit() first."
-            )
+            raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         result: dict[str, list[dict[str, Any]]] = {}
         for col_name, rules in self.recommendations_.items():
@@ -311,9 +318,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             FeatureIQError: If called before fit().
         """
         if not self.is_fitted_ or self.pipeline_ is None:
-            raise FeatureIQError(
-                "FeatureIQ has not been fitted. Call fit() first."
-            )
+            raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
         return self.pipeline_
 
     def validate(
@@ -343,11 +348,17 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         from sklearn.model_selection import cross_val_score
         from sklearn.pipeline import Pipeline as Pipe
 
-        if not self.is_fitted_ or self.recommendations_ is None or self.profile_ is None:
+        if (
+            not self.is_fitted_
+            or self.recommendations_ is None
+            or self.profile_ is None
+        ):
             raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         fiq_pipe = build_pipeline(
-            self.recommendations_, self.profile_, estimator=clone(estimator),
+            self.recommendations_,
+            self.profile_,
+            estimator=clone(estimator),
             pre_steps=list(self.pre_transforms) if self.pre_transforms else None,
             post_steps=list(self.post_transforms) if self.post_transforms else None,
         )
@@ -357,10 +368,12 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
 
         numeric_cols = X.select_dtypes(include=[np.number]).columns.tolist()
         if numeric_cols:
-            baseline_pipe = Pipe([
-                ("passthrough", CT([], remainder="passthrough")),
-                ("estimator", clone(estimator)),
-            ])
+            baseline_pipe = Pipe(
+                [
+                    ("passthrough", CT([], remainder="passthrough")),
+                    ("estimator", clone(estimator)),
+                ]
+            )
             baseline_scores = cross_val_score(
                 baseline_pipe, X[numeric_cols], y, cv=cv, scoring=scoring
             )
@@ -396,8 +409,8 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             scoring: Scoring metric name.
 
         Returns:
-            List of dicts with column, transformation, score_with, score_without, impact,
-            sorted by impact descending.
+            List of dicts with column, transformation, score_with,
+            score_without, impact, sorted by impact descending.
         """
         from sklearn.base import clone
         from sklearn.model_selection import cross_val_score
@@ -406,7 +419,9 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         full_pipe = build_pipeline(
-            self.recommendations_, self.profile_, estimator=clone(estimator),
+            self.recommendations_,
+            self.profile_,
+            estimator=clone(estimator),
             pre_steps=list(self.pre_transforms) if self.pre_transforms else None,
             post_steps=list(self.post_transforms) if self.post_transforms else None,
         )
@@ -429,9 +444,15 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
 
                 try:
                     ablated_pipe = build_pipeline(
-                        ablated_recs, self.profile_, estimator=clone(estimator),
-                        pre_steps=list(self.pre_transforms) if self.pre_transforms else None,
-                        post_steps=list(self.post_transforms) if self.post_transforms else None,
+                        ablated_recs,
+                        self.profile_,
+                        estimator=clone(estimator),
+                        pre_steps=(
+                            list(self.pre_transforms) if self.pre_transforms else None
+                        ),
+                        post_steps=(
+                            list(self.post_transforms) if self.post_transforms else None
+                        ),
                     )
                     ablated_scores = cross_val_score(
                         ablated_pipe, X, y, cv=cv, scoring=scoring
@@ -440,13 +461,15 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
                 except Exception:
                     ablated_mean = full_mean
 
-                results.append({
-                    "column": col_name,
-                    "transformation": rule.transformation,
-                    "score_with": full_mean,
-                    "score_without": ablated_mean,
-                    "impact": full_mean - ablated_mean,
-                })
+                results.append(
+                    {
+                        "column": col_name,
+                        "transformation": rule.transformation,
+                        "score_with": full_mean,
+                        "score_without": ablated_mean,
+                        "impact": full_mean - ablated_mean,
+                    }
+                )
 
         results.sort(key=lambda x: x["impact"], reverse=True)
         return results
@@ -463,10 +486,12 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         Returns:
             Formatted string (plain text, no rich markup).
         """
-        if not self.is_fitted_ or self.profile_ is None or self.recommendations_ is None:
-            raise FeatureIQError(
-                "FeatureIQ has not been fitted. Call fit() first."
-            )
+        if (
+            not self.is_fitted_
+            or self.profile_ is None
+            or self.recommendations_ is None
+        ):
+            raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         n_profiled = len(self.profile_.column_profiles)
         n_transforms = sum(
@@ -511,10 +536,12 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         Raises:
             FeatureIQError: If called before fit().
         """
-        if not self.is_fitted_ or self.recommendations_ is None or self.profile_ is None:
-            raise FeatureIQError(
-                "FeatureIQ has not been fitted. Call fit() first."
-            )
+        if (
+            not self.is_fitted_
+            or self.recommendations_ is None
+            or self.profile_ is None
+        ):
+            raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         af = self._resolve_algorithm_family()
         pt = self._resolve_problem_type()
@@ -553,8 +580,6 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         problem_type: ProblemType,
     ) -> dict[str, Any]:
         """Build a detailed explanation dict for a single rule application."""
-        from featureiq.utils.validation import AlgorithmFamily as AF
-
         parts: list[str] = []
         evidence: dict[str, Any] = {
             "algorithm_family": algorithm_family.value,
@@ -570,10 +595,11 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
                 evidence["skewness"] = col_profile.skewness
                 evidence["is_skewed"] = col_profile.is_skewed
                 direction = "+" if col_profile.skewness > 0 else ""
+                skew_prefix = "skewed " if col_profile.is_skewed else ""
                 parts.append(
-                    f"{column} is a {'skewed ' if col_profile.is_skewed else ''}"
-                    f"numerical feature (skewness={direction}{col_profile.skewness:.2f}, "
-                    f"threshold={1.0})"
+                    f"{column} is a {skew_prefix}"
+                    f"numerical feature (skewness={direction}"
+                    f"{col_profile.skewness:.2f}, threshold={1.0})"
                 )
 
             if cond.has_missing is not None:
@@ -584,7 +610,10 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
                         f"{column} has {col_profile.missing_rate:.1%} missing values"
                     )
 
-            if cond.cardinality_level is not None or cond.is_high_cardinality is not None:
+            if (
+                cond.cardinality_level is not None
+                or cond.is_high_cardinality is not None
+            ):
                 evidence["n_unique"] = col_profile.n_unique
                 evidence["unique_ratio"] = col_profile.unique_ratio
                 evidence["cardinality_level"] = col_profile.cardinality_level
@@ -598,7 +627,10 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
             if cond.is_monotonic is not None and col_profile.is_monotonic is not None:
                 evidence["is_monotonic"] = col_profile.is_monotonic
 
-            if cond.has_regular_frequency is not None and col_profile.has_regular_frequency is not None:
+            if (
+                cond.has_regular_frequency is not None
+                and col_profile.has_regular_frequency is not None
+            ):
                 evidence["has_regular_frequency"] = col_profile.has_regular_frequency
 
             if col_profile.outlier_fraction is not None:
@@ -644,9 +676,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
 
         try:
             from rich.console import Console
-            from rich.panel import Panel
             from rich.table import Table
-            from rich.text import Text
 
             console = Console()
             console.print()

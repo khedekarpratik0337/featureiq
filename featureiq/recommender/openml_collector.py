@@ -80,9 +80,7 @@ def fetch_openml_tasks(
             output_format="dataframe",
         )
     except Exception as exc:
-        raise RecommenderError(
-            f"Failed to fetch tasks from OpenML: {exc}"
-        ) from exc
+        raise RecommenderError(f"Failed to fetch tasks from OpenML: {exc}") from exc
 
     filtered = tasks[
         (tasks["NumberOfInstances"] >= min_instances)
@@ -152,10 +150,12 @@ def fetch_openml_tasks(
                 transformer = spec.transformer_class(**spec.default_kwargs)
 
                 try:
-                    pipe = SkPipeline([
-                        ("transform", transformer),
-                        ("clf", LogisticRegression(max_iter=500, solver="lbfgs")),
-                    ])
+                    pipe = SkPipeline(
+                        [
+                            ("transform", transformer),
+                            ("clf", LogisticRegression(max_iter=500, solver="lbfgs")),
+                        ]
+                    )
                     scores = cross_val_score(
                         pipe, X_numeric, y_enc, cv=3, scoring="accuracy"
                     )
@@ -164,13 +164,15 @@ def fetch_openml_tasks(
                     continue
 
                 delta = transform_acc - baseline_acc
-                records.append({
-                    "task_id": int(task_id),
-                    "meta_features": meta_vec,
-                    "transformation": transform_name,
-                    "performance_delta": delta,
-                    "label": 1 if delta > 0.001 else 0,
-                })
+                records.append(
+                    {
+                        "task_id": int(task_id),
+                        "meta_features": meta_vec,
+                        "transformation": transform_name,
+                        "performance_delta": delta,
+                        "label": 1 if delta > 0.001 else 0,
+                    }
+                )
 
             collected += 1
             logger.info(f"Collected task {task_id} ({collected}/{n_tasks})")
@@ -180,9 +182,7 @@ def fetch_openml_tasks(
             continue
 
     if not records:
-        raise RecommenderError(
-            "Failed to collect any training data from OpenML."
-        )
+        raise RecommenderError("Failed to collect any training data from OpenML.")
 
     return records
 
@@ -212,9 +212,7 @@ def load_training_data(input_path: str) -> list[dict[str, Any]]:
     try:
         data = joblib.load(input_path)
     except FileNotFoundError as exc:
-        raise RecommenderError(
-            f"Training data file not found: {input_path}"
-        ) from exc
+        raise RecommenderError(f"Training data file not found: {input_path}") from exc
     except Exception as exc:
         raise RecommenderError(
             f"Failed to load training data from {input_path}: {exc}"

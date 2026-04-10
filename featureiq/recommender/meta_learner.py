@@ -30,7 +30,8 @@ class MetaLearner:
     Attributes:
         model: Dict mapping transformation name to trained LightGBM classifier.
         is_fitted: Boolean flag.
-        supported_transformations: List of transformation names the model can predict for.
+        supported_transformations: List of transformation names the model
+            can predict for.
     """
 
     def __init__(self, model_path: str | None = None) -> None:
@@ -41,10 +42,16 @@ class MetaLearner:
         if model_path is not None:
             self.load(model_path)
         else:
-            default_path = Path(__file__).parent / "pretrained" / f"meta_learner_{META_LEARNER_VERSION}.joblib"
+            default_path = (
+                Path(__file__).parent
+                / "pretrained"
+                / f"meta_learner_{META_LEARNER_VERSION}.joblib"
+            )
             if default_path.exists():
                 self.load(str(default_path))
-                logger.info("Loaded bundled meta-learner model (%s).", META_LEARNER_VERSION)
+                logger.info(
+                    "Loaded bundled meta-learner model (%s).", META_LEARNER_VERSION
+                )
 
     def train(
         self,
@@ -73,32 +80,29 @@ class MetaLearner:
             t_name = record["transformation"]
             if t_name not in transform_records:
                 transform_records[t_name] = []
-            transform_records[t_name].append(
-                (record["meta_features"], record["label"])
-            )
+            transform_records[t_name].append((record["meta_features"], record["label"]))
 
         scores: dict[str, float] = {}
         self.models = {}
 
         for t_name, records in transform_records.items():
             if len(records) < 5:
-                logger.warning(
-                    f"Skipping '{t_name}': only {len(records)} records."
-                )
+                logger.warning(f"Skipping '{t_name}': only {len(records)} records.")
                 continue
 
             X_all = np.array([r[0] for r in records])
             y_all = np.array([r[1] for r in records])
 
             if len(np.unique(y_all)) < 2:
-                logger.warning(
-                    f"Skipping '{t_name}': only one class present."
-                )
+                logger.warning(f"Skipping '{t_name}': only one class present.")
                 scores[t_name] = 0.5
                 continue
 
             X_train, X_val, y_train, y_val = train_test_split(
-                X_all, y_all, test_size=test_size, random_state=random_state,
+                X_all,
+                y_all,
+                test_size=test_size,
+                random_state=random_state,
                 stratify=y_all,
             )
 
@@ -183,13 +187,9 @@ class MetaLearner:
         try:
             data = joblib.load(path)
         except FileNotFoundError as exc:
-            raise RecommenderError(
-                f"Model file not found: {path}"
-            ) from exc
+            raise RecommenderError(f"Model file not found: {path}") from exc
         except Exception as exc:
-            raise RecommenderError(
-                f"Failed to load model from {path}: {exc}"
-            ) from exc
+            raise RecommenderError(f"Failed to load model from {path}: {exc}") from exc
 
         self.models = data["models"]
         self.supported_transformations = data["supported_transformations"]

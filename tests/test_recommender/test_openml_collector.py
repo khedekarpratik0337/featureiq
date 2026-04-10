@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -15,7 +12,6 @@ from featureiq.exceptions import RecommenderError
 from featureiq.recommender.openml_collector import (
     fetch_openml_tasks,
     load_training_data,
-    save_training_data,
 )
 
 
@@ -48,10 +44,12 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200, 300],
-            "tid": [1, 2],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200, 300],
+                "tid": [1, 2],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         rng = np.random.RandomState(42)
@@ -68,7 +66,9 @@ class TestFetchOpenmlTasks:
         mock_openml.tasks.get_task.return_value = mock_task
 
         with patch.dict("sys.modules", {"openml": mock_openml}):
-            records = fetch_openml_tasks(n_tasks=1, min_instances=100, max_instances=1000)
+            records = fetch_openml_tasks(
+                n_tasks=1, min_instances=100, max_instances=1000
+            )
 
         assert len(records) > 0
         for rec in records:
@@ -81,10 +81,12 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200],
-            "tid": [1],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200],
+                "tid": [1],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         mock_dataset = MagicMock()
@@ -103,10 +105,12 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200],
-            "tid": [1],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200],
+                "tid": [1],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         X_data = pd.DataFrame({"cat1": ["a"] * 200, "cat2": ["b"] * 200})
@@ -128,10 +132,12 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200],
-            "tid": [1],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200],
+                "tid": [1],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         rng = np.random.RandomState(42)
@@ -154,17 +160,17 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200, 300],
-            "tid": [1, 2],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200, 300],
+                "tid": [1, 2],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         rng = np.random.RandomState(42)
         X_good = pd.DataFrame(rng.randn(200, 5), columns=[f"f{i}" for i in range(5)])
-        y_good = pd.Series(
-            np.concatenate([np.zeros(100), np.ones(100)]), name="target"
-        )
+        y_good = pd.Series(np.concatenate([np.zeros(100), np.ones(100)]), name="target")
 
         mock_dataset_good = MagicMock()
         mock_dataset_good.default_target_attribute = "target"
@@ -190,17 +196,17 @@ class TestFetchOpenmlTasks:
         mock_openml = MagicMock()
         mock_openml.tasks.TaskType.SUPERVISED_CLASSIFICATION = 1
 
-        tasks_df = pd.DataFrame({
-            "NumberOfInstances": [200],
-            "tid": [1],
-        })
+        tasks_df = pd.DataFrame(
+            {
+                "NumberOfInstances": [200],
+                "tid": [1],
+            }
+        )
         mock_openml.tasks.list_tasks.return_value = tasks_df
 
         rng = np.random.RandomState(42)
         X_data = pd.DataFrame(rng.randn(200, 5), columns=[f"f{i}" for i in range(5)])
-        y_data = pd.Series(
-            np.concatenate([np.zeros(100), np.ones(100)]), name="target"
-        )
+        y_data = pd.Series(np.concatenate([np.zeros(100), np.ones(100)]), name="target")
 
         mock_dataset = MagicMock()
         mock_dataset.default_target_attribute = "target"

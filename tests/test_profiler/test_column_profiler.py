@@ -166,9 +166,7 @@ class TestProfileDatetimeColumn:
         assert result["has_regular_frequency"] is True
 
     def test_two_identical_datetime_values(self) -> None:
-        s = pd.Series(
-            pd.to_datetime(["2020-01-01", "2020-01-01"]), name="dup_dt"
-        )
+        s = pd.Series(pd.to_datetime(["2020-01-01", "2020-01-01"]), name="dup_dt")
         result = profile_datetime_column(s)
         assert "is_monotonic" in result
         assert "has_regular_frequency" in result

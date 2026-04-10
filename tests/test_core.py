@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import pytest
 from sklearn.datasets import load_breast_cancer, load_diabetes, load_iris
-from sklearn.linear_model import LogisticRegression, Ridge
+from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 from featureiq import (
@@ -82,20 +82,22 @@ class TestIntegration:
     ) -> None:
         X, y = breast_cancer_data
         X_train, X_test = X.iloc[:400], X.iloc[400:]
-        y_train, y_test = y.iloc[:400], y.iloc[400:]
+        y_train = y.iloc[:400]
 
-        pipe = Pipeline([
-            (
-                "fiq",
-                FeatureIQ(
-                    problem_type="binary_classification",
-                    algorithm="logistic_regression",
-                    use_meta_learner=False,
-                    verbose=False,
+        pipe = Pipeline(
+            [
+                (
+                    "fiq",
+                    FeatureIQ(
+                        problem_type="binary_classification",
+                        algorithm="logistic_regression",
+                        use_meta_learner=False,
+                        verbose=False,
+                    ),
                 ),
-            ),
-            ("clf", LogisticRegression(max_iter=1000)),
-        ])
+                ("clf", LogisticRegression(max_iter=1000)),
+            ]
+        )
         pipe.fit(X_train, y_train)
         predictions = pipe.predict(X_test)
         assert len(predictions) == len(X_test)
@@ -324,13 +326,15 @@ class TestMetaLearnerIntegration:
         records = []
         transforms = ["standard_scaler", "log_transform", "one_hot_encoder"]
         for _ in range(100):
-            records.append({
-                "task_id": rng.randint(1, 10000),
-                "meta_features": rng.randn(26).astype(np.float64),
-                "transformation": rng.choice(transforms),
-                "performance_delta": rng.uniform(-0.1, 0.1),
-                "label": int(rng.choice([0, 1])),
-            })
+            records.append(
+                {
+                    "task_id": rng.randint(1, 10000),
+                    "meta_features": rng.randn(26).astype(np.float64),
+                    "transformation": rng.choice(transforms),
+                    "performance_delta": rng.uniform(-0.1, 0.1),
+                    "label": int(rng.choice([0, 1])),
+                }
+            )
 
         ml = MetaLearner()
         ml.train(records)
@@ -422,11 +426,13 @@ class TestAnomalyDetection:
 
     def test_anomaly_detection_y_none_works(self) -> None:
         rng = np.random.RandomState(42)
-        X = pd.DataFrame({
-            "a": rng.randn(100),
-            "b": rng.randn(100),
-            "c": rng.randn(100),
-        })
+        X = pd.DataFrame(
+            {
+                "a": rng.randn(100),
+                "b": rng.randn(100),
+                "c": rng.randn(100),
+            }
+        )
         fiq = FeatureIQ(
             problem_type="anomaly_detection",
             algorithm="isolation_forest",
@@ -438,11 +444,13 @@ class TestAnomalyDetection:
 
     def test_anomaly_detection_y_none_regression_raises(self) -> None:
         rng = np.random.RandomState(42)
-        X = pd.DataFrame({
-            "a": rng.randn(100),
-            "b": rng.randn(100),
-            "c": rng.randn(100),
-        })
+        X = pd.DataFrame(
+            {
+                "a": rng.randn(100),
+                "b": rng.randn(100),
+                "c": rng.randn(100),
+            }
+        )
         fiq = FeatureIQ(
             problem_type="regression",
             algorithm="isolation_forest",
@@ -476,8 +484,13 @@ class TestExplain:
         assert isinstance(result, dict)
         assert len(result) > 0
         required_keys = {
-            "column", "transformation", "confidence",
-            "explanation", "evidence", "source", "rule_id",
+            "column",
+            "transformation",
+            "confidence",
+            "explanation",
+            "evidence",
+            "source",
+            "rule_id",
         }
         for col_name, explanations in result.items():
             for entry in explanations:
@@ -498,8 +511,13 @@ class TestExplain:
         result = fiq.explain(column=col)
         assert isinstance(result, list)
         required_keys = {
-            "column", "transformation", "confidence",
-            "explanation", "evidence", "source", "rule_id",
+            "column",
+            "transformation",
+            "confidence",
+            "explanation",
+            "evidence",
+            "source",
+            "rule_id",
         }
         for entry in result:
             assert required_keys.issubset(entry.keys())

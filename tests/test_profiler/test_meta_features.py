@@ -89,7 +89,11 @@ class TestBuildMetaFeatureVector:
         assert vec[3] == float(profile.n_categorical)
         assert vec[4] == float(profile.n_datetime)
         assert vec[5] == profile.overall_missing_rate
-        cir = profile.class_imbalance_ratio if profile.class_imbalance_ratio is not None else 0.0
+        cir = (
+            profile.class_imbalance_ratio
+            if profile.class_imbalance_ratio is not None
+            else 0.0
+        )
         assert vec[6] == pytest.approx(cir)
         assert vec[7] == pytest.approx(profile.feature_to_row_ratio)
         assert vec[8] == (1.0 if profile.has_temporal_structure else 0.0)

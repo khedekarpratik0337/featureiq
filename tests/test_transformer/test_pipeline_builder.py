@@ -23,7 +23,7 @@ from featureiq.transformer.registry import (
     RollingStatsGenerator,
     get_transformer,
 )
-from featureiq.utils.validation import AlgorithmFamily, ColumnType, ProblemType
+from featureiq.utils.validation import AlgorithmFamily, ProblemType
 
 
 class TestTransformerRegistry:
@@ -57,9 +57,7 @@ class TestCustomTransformers:
         assert result["val"].max() < 100.0
 
     def test_date_component_extractor(self) -> None:
-        df = pd.DataFrame(
-            {"dt": pd.date_range("2020-01-01", periods=10, freq="D")}
-        )
+        df = pd.DataFrame({"dt": pd.date_range("2020-01-01", periods=10, freq="D")})
         ext = DateComponentExtractor(components=["year", "month", "day", "weekday"])
         result = ext.fit_transform(df)
         assert "dt_year" in result.columns
@@ -110,11 +108,13 @@ class TestBinaryEncoder:
         assert len(bin_cols) >= 1
 
     def test_multiple_categorical_columns(self) -> None:
-        df = pd.DataFrame({
-            "a": ["x", "y", "z"] * 10,
-            "b": ["p", "q"] * 15,
-            "num": range(30),
-        })
+        df = pd.DataFrame(
+            {
+                "a": ["x", "y", "z"] * 10,
+                "b": ["p", "q"] * 15,
+                "num": range(30),
+            }
+        )
         enc = BinaryEncoder(variables=["a", "b"])
         result = enc.fit_transform(df)
         assert "a" not in result.columns
@@ -155,9 +155,7 @@ class TestBuildPipeline:
         self, mixed_dataframe: pd.DataFrame, target_binary: pd.Series
     ) -> None:
         df = mixed_dataframe.drop(columns=["date1"])
-        profile = profile_dataset(
-            df, target_binary, ProblemType.BINARY_CLASSIFICATION
-        )
+        profile = profile_dataset(df, target_binary, ProblemType.BINARY_CLASSIFICATION)
         engine = OntologyEngine()
         recs = engine.recommend_for_dataset(
             profile, AlgorithmFamily.LINEAR_MODEL, ProblemType.BINARY_CLASSIFICATION
@@ -170,9 +168,7 @@ class TestBuildPipeline:
         self, mixed_dataframe: pd.DataFrame, target_binary: pd.Series
     ) -> None:
         df = mixed_dataframe.drop(columns=["date1"])
-        profile = profile_dataset(
-            df, target_binary, ProblemType.BINARY_CLASSIFICATION
-        )
+        profile = profile_dataset(df, target_binary, ProblemType.BINARY_CLASSIFICATION)
         pipe = build_pipeline({}, profile)
         result = pipe.fit_transform(df)
         assert result is not None
@@ -181,14 +177,14 @@ class TestBuildPipeline:
         self, mixed_dataframe: pd.DataFrame, target_binary: pd.Series
     ) -> None:
         df = mixed_dataframe.drop(columns=["date1"])
-        profile = profile_dataset(
-            df, target_binary, ProblemType.BINARY_CLASSIFICATION
-        )
+        profile = profile_dataset(df, target_binary, ProblemType.BINARY_CLASSIFICATION)
         engine = OntologyEngine()
         recs = engine.recommend_for_dataset(
             profile, AlgorithmFamily.LINEAR_MODEL, ProblemType.BINARY_CLASSIFICATION
         )
-        pipe = build_pipeline(recs, profile, estimator=LogisticRegression(max_iter=1000))
+        pipe = build_pipeline(
+            recs, profile, estimator=LogisticRegression(max_iter=1000)
+        )
         pipe.fit(df, target_binary)
         preds = pipe.predict(df)
         assert len(preds) == len(df)

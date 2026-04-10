@@ -5,7 +5,7 @@ from __future__ import annotations
 from featureiq.ontology.rule_loader import OntologyRule, load_all_rules
 from featureiq.profiler.column_profiler import ColumnProfile
 from featureiq.profiler.dataset_profiler import DatasetProfile
-from featureiq.utils.validation import AlgorithmFamily, ColumnType, ProblemType
+from featureiq.utils.validation import AlgorithmFamily, ProblemType
 
 
 def match_rule_to_column(
@@ -41,7 +41,10 @@ def match_rule_to_column(
         return False
 
     if cond.is_skewed is not None:
-        if column_profile.is_skewed is None or cond.is_skewed != column_profile.is_skewed:
+        if (
+            column_profile.is_skewed is None
+            or cond.is_skewed != column_profile.is_skewed
+        ):
             return False
 
     if cond.has_missing is not None:
@@ -65,7 +68,10 @@ def match_rule_to_column(
             return False
 
     if cond.is_monotonic is not None:
-        if column_profile.is_monotonic is None or cond.is_monotonic != column_profile.is_monotonic:
+        if (
+            column_profile.is_monotonic is None
+            or cond.is_monotonic != column_profile.is_monotonic
+        ):
             return False
 
     if cond.has_regular_frequency is not None:
@@ -171,7 +177,10 @@ def get_dataset_level_rules(
 
         if rule.id == "TGT_002" and problem_type != ProblemType.BINARY_CLASSIFICATION:
             continue
-        if rule.id == "TGT_003" and problem_type != ProblemType.MULTICLASS_CLASSIFICATION:
+        if (
+            rule.id == "TGT_003"
+            and problem_type != ProblemType.MULTICLASS_CLASSIFICATION
+        ):
             continue
         if rule.id == "TGT_001" and problem_type not in (
             ProblemType.REGRESSION,

@@ -26,13 +26,15 @@ def _make_synthetic_training_data(n: int = 50) -> list[dict]:
         meta = rng.randn(26).astype(np.float64)
         t = rng.choice(transforms)
         label = rng.choice([0, 1])
-        records.append({
-            "task_id": rng.randint(1, 10000),
-            "meta_features": meta,
-            "transformation": t,
-            "performance_delta": rng.uniform(-0.1, 0.1),
-            "label": int(label),
-        })
+        records.append(
+            {
+                "task_id": rng.randint(1, 10000),
+                "meta_features": meta,
+                "transformation": t,
+                "performance_delta": rng.uniform(-0.1, 0.1),
+                "label": int(label),
+            }
+        )
     return records
 
 
@@ -83,23 +85,27 @@ class TestMetaLearner:
         rng = np.random.RandomState(42)
         records = []
         for _ in range(3):
-            records.append({
-                "task_id": rng.randint(1, 10000),
-                "meta_features": rng.randn(26).astype(np.float64),
-                "transformation": "rare_transform",
-                "performance_delta": 0.01,
-                "label": 1,
-            })
+            records.append(
+                {
+                    "task_id": rng.randint(1, 10000),
+                    "meta_features": rng.randn(26).astype(np.float64),
+                    "transformation": "rare_transform",
+                    "performance_delta": 0.01,
+                    "label": 1,
+                }
+            )
         for _ in range(50):
-            records.append({
-                "task_id": rng.randint(1, 10000),
-                "meta_features": rng.randn(26).astype(np.float64),
-                "transformation": "standard_scaler",
-                "performance_delta": 0.01,
-                "label": rng.choice([0, 1]),
-            })
+            records.append(
+                {
+                    "task_id": rng.randint(1, 10000),
+                    "meta_features": rng.randn(26).astype(np.float64),
+                    "transformation": "standard_scaler",
+                    "performance_delta": 0.01,
+                    "label": rng.choice([0, 1]),
+                }
+            )
         ml = MetaLearner()
-        scores = ml.train(records)
+        ml.train(records)
         assert "rare_transform" not in ml.models
         assert "standard_scaler" in ml.models
 
@@ -107,13 +113,15 @@ class TestMetaLearner:
         rng = np.random.RandomState(42)
         records = []
         for _ in range(20):
-            records.append({
-                "task_id": rng.randint(1, 10000),
-                "meta_features": rng.randn(26).astype(np.float64),
-                "transformation": "mono_transform",
-                "performance_delta": 0.01,
-                "label": 1,
-            })
+            records.append(
+                {
+                    "task_id": rng.randint(1, 10000),
+                    "meta_features": rng.randn(26).astype(np.float64),
+                    "transformation": "mono_transform",
+                    "performance_delta": 0.01,
+                    "label": 1,
+                }
+            )
         ml = MetaLearner()
         scores = ml.train(records)
         assert scores["mono_transform"] == 0.5

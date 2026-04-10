@@ -104,7 +104,11 @@ def build_meta_feature_vector(
         float(profile.n_categorical),
         float(profile.n_datetime),
         profile.overall_missing_rate,
-        profile.class_imbalance_ratio if profile.class_imbalance_ratio is not None else 0.0,
+        (
+            profile.class_imbalance_ratio
+            if profile.class_imbalance_ratio is not None
+            else 0.0
+        ),
         profile.feature_to_row_ratio,
         1.0 if profile.has_temporal_structure else 0.0,
     ]
@@ -138,7 +142,7 @@ def build_meta_feature_vector(
     if profile.correlation_matrix:
         cols = list(profile.correlation_matrix.keys())
         for i, c1 in enumerate(cols):
-            for c2 in cols[i + 1:]:
+            for c2 in cols[i + 1 :]:
                 corr_values.append(abs(profile.correlation_matrix[c1].get(c2, 0.0)))
     mean_correlation = float(np.mean(corr_values)) if corr_values else 0.0
 

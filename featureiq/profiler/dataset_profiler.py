@@ -80,7 +80,9 @@ def compute_class_imbalance(
     return minority / majority
 
 
-def _infer_frequency(X: pd.DataFrame, column_profiles: dict[str, ColumnProfile]) -> str | None:
+def _infer_frequency(
+    X: pd.DataFrame, column_profiles: dict[str, ColumnProfile]
+) -> str | None:
     """Infer temporal frequency from the first datetime column found."""
     for col_name, cp in column_profiles.items():
         if cp.column_type != ColumnType.DATETIME:
@@ -106,7 +108,8 @@ def _compute_correlation_matrix(
 ]:
     """Compute pairwise Pearson correlation for numerical columns."""
     num_cols = [
-        name for name, cp in column_profiles.items()
+        name
+        for name, cp in column_profiles.items()
         if cp.column_type == ColumnType.NUMERICAL and name in X.columns
     ]
     if len(num_cols) < 2:
@@ -120,7 +123,7 @@ def _compute_correlation_matrix(
     pairs: list[tuple[str, str, float]] = []
     seen: set[tuple[str, str]] = set()
     for i, c1 in enumerate(num_cols):
-        for c2 in num_cols[i + 1:]:
+        for c2 in num_cols[i + 1 :]:
             r = abs(float(corr_df.loc[c1, c2]))
             if r > CORRELATION_THRESHOLD:
                 pair = (c1, c2) if c1 < c2 else (c2, c1)
@@ -137,7 +140,8 @@ def _compute_vif_scores(
 ) -> dict[str, float]:
     """Compute Variance Inflation Factor for numerical columns using OLS."""
     num_cols = [
-        name for name, cp in column_profiles.items()
+        name
+        for name, cp in column_profiles.items()
         if cp.column_type == ColumnType.NUMERICAL and name in X.columns
     ]
     if len(num_cols) < 2:
@@ -236,7 +240,9 @@ def profile_dataset(
     n_rows = len(X)
     n_columns = len(X.columns)
     overall_missing_rate = float(X.isna().mean().mean())
-    class_imbalance_ratio = compute_class_imbalance(y, problem_type) if y is not None else None
+    class_imbalance_ratio = (
+        compute_class_imbalance(y, problem_type) if y is not None else None
+    )
     feature_to_row_ratio = n_columns / n_rows if n_rows > 0 else 0.0
     n_temporal = type_counts[ColumnType.DATETIME]
     has_temporal_structure = n_temporal > 0

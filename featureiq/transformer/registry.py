@@ -22,7 +22,6 @@ from sklearn.preprocessing import (
 from featureiq.exceptions import TransformerError
 from featureiq.utils.validation import ColumnType
 
-
 # ---------------------------------------------------------------------------
 # Custom sklearn-compatible transformers
 # ---------------------------------------------------------------------------
@@ -57,7 +56,9 @@ class RareLabelGrouper(BaseEstimator, TransformerMixin):
         """
         df = X if isinstance(X, pd.DataFrame) else pd.DataFrame(X)
         cols = self.variables or [
-            c for c in df.columns if df[c].dtype == object or hasattr(df[c].dtype, "categories")
+            c
+            for c in df.columns
+            if df[c].dtype == object or hasattr(df[c].dtype, "categories")
         ]
         for col in cols:
             freq = df[col].value_counts(normalize=True)
@@ -76,9 +77,7 @@ class RareLabelGrouper(BaseEstimator, TransformerMixin):
         df = X.copy() if isinstance(X, pd.DataFrame) else pd.DataFrame(X).copy()
         for col, frequent in self.frequent_labels_.items():
             if col in df.columns:
-                df[col] = df[col].apply(
-                    lambda x, f=frequent: x if x in f else "Rare"
-                )
+                df[col] = df[col].apply(lambda x, f=frequent: x if x in f else "Rare")
         return df
 
 
@@ -431,7 +430,8 @@ class BinaryEncoder(BaseEstimator, TransformerMixin):
         """
         df = X if isinstance(X, pd.DataFrame) else pd.DataFrame(X)
         self.cols_ = self.variables or [
-            c for c in df.columns
+            c
+            for c in df.columns
             if df[c].dtype == object or hasattr(df[c].dtype, "categories")
         ]
         if not self.cols_:
@@ -524,7 +524,9 @@ TRANSFORMER_REGISTRY: dict[str, TransformerSpec] = {
         transformer_class=StandardScaler,
         default_kwargs={},
         applies_to=[ColumnType.NUMERICAL],
-        description="Standardize features by removing the mean and scaling to unit variance",
+        description=(
+            "Standardize features by removing the mean and " "scaling to unit variance"
+        ),
     ),
     "min_max_scaler": TransformerSpec(
         transformer_class=MinMaxScaler,

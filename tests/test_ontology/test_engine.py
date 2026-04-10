@@ -185,10 +185,15 @@ class TestRuleMatching:
             is_monotonic=False,
             has_regular_frequency=True,
         )
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.TREE_BASED,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is False
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.TREE_BASED,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is False
+        )
 
     def test_is_monotonic_none_rejects_rule(self) -> None:
         rule = OntologyRule(
@@ -216,10 +221,15 @@ class TestRuleMatching:
             is_monotonic=None,
             has_regular_frequency=True,
         )
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.TREE_BASED,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is False
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.TREE_BASED,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is False
+        )
 
     def test_algorithm_in_both_families_and_contraindicated(self) -> None:
         rule = OntologyRule(
@@ -253,14 +263,24 @@ class TestRuleMatching:
             outlier_fraction=0.0,
             is_normal=True,
         )
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.ENSEMBLE,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is False
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is True
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.ENSEMBLE,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is False
+        )
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is True
+        )
 
 
 class TestDatasetLevelRules:
@@ -286,7 +306,9 @@ class TestDatasetLevelRules:
             column_profiles={},
         )
         ds_rules = get_dataset_level_rules(
-            profile, rules, AlgorithmFamily.TREE_BASED,
+            profile,
+            rules,
+            AlgorithmFamily.TREE_BASED,
             ProblemType.BINARY_CLASSIFICATION,
         )
         rule_ids = [r.id for r in ds_rules]
@@ -314,7 +336,9 @@ class TestDatasetLevelRules:
             column_profiles={},
         )
         ds_rules = get_dataset_level_rules(
-            profile, rules, AlgorithmFamily.LINEAR_MODEL,
+            profile,
+            rules,
+            AlgorithmFamily.LINEAR_MODEL,
             ProblemType.REGRESSION,
         )
         rule_ids = [r.id for r in ds_rules]
@@ -353,7 +377,9 @@ class TestDatasetLevelRules:
             column_profiles={},
         )
         ds_rules = get_dataset_level_rules(
-            profile, [rule], AlgorithmFamily.LINEAR_MODEL,
+            profile,
+            [rule],
+            AlgorithmFamily.LINEAR_MODEL,
             ProblemType.BINARY_CLASSIFICATION,
         )
         assert len(ds_rules) == 0
@@ -468,14 +494,24 @@ class TestTimeSeriesRules:
             outlier_fraction=0.0,
             is_normal=True,
         )
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.REGRESSION,
-        ) is False
-        assert match_rule_to_column(
-            rule, profile, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.ANOMALY_DETECTION,
-        ) is True
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.REGRESSION,
+            )
+            is False
+        )
+        assert (
+            match_rule_to_column(
+                rule,
+                profile,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.ANOMALY_DETECTION,
+            )
+            is True
+        )
 
     def test_has_regular_frequency_condition(self) -> None:
         rule = OntologyRule(
@@ -523,18 +559,33 @@ class TestTimeSeriesRules:
             has_missing=False,
             has_regular_frequency=None,
         )
-        assert match_rule_to_column(
-            rule, profile_match, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is True
-        assert match_rule_to_column(
-            rule, profile_no_match, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is False
-        assert match_rule_to_column(
-            rule, profile_none, AlgorithmFamily.LINEAR_MODEL,
-            ProblemType.BINARY_CLASSIFICATION,
-        ) is False
+        assert (
+            match_rule_to_column(
+                rule,
+                profile_match,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is True
+        )
+        assert (
+            match_rule_to_column(
+                rule,
+                profile_no_match,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is False
+        )
+        assert (
+            match_rule_to_column(
+                rule,
+                profile_none,
+                AlgorithmFamily.LINEAR_MODEL,
+                ProblemType.BINARY_CLASSIFICATION,
+            )
+            is False
+        )
 
 
 class TestAnomalyDetectionRules:
@@ -614,7 +665,9 @@ class TestAnomalyDetectionRules:
             column_profiles={},
         )
         ds_rules = get_dataset_level_rules(
-            profile, all_rules, AlgorithmFamily.DISTANCE_BASED,
+            profile,
+            all_rules,
+            AlgorithmFamily.DISTANCE_BASED,
             ProblemType.ANOMALY_DETECTION,
         )
         rule_ids = [r.id for r in ds_rules]
@@ -640,7 +693,9 @@ class TestAnomalyDetectionRules:
             column_profiles={},
         )
         ds_rules = get_dataset_level_rules(
-            profile, all_rules, AlgorithmFamily.LINEAR_MODEL,
+            profile,
+            all_rules,
+            AlgorithmFamily.LINEAR_MODEL,
             ProblemType.REGRESSION,
         )
         rule_ids = [r.id for r in ds_rules]
