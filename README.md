@@ -178,7 +178,7 @@ To contribute ontology rules, see [docs/contributing_rules.md](docs/contributing
 ## Citation
 
 ```bibtex
-@software{featureiq2024,
+@software{featureiq2026,
   title={FeatureIQ: Context-Aware Automated Feature Engineering},
   author={Pratik Khedekar},
   year={2026},
