@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2026-04-10
+
+### Changed
+
+- Minimum Python version raised from 3.9 to 3.10 (Python 3.9 reached EOL October 2025)
+
+### Fixed
+
+- Added `.flake8` config to align line-length (88) with black formatter
+- Fixed mypy strict mode compatibility with untyped third-party libraries (sklearn, scipy)
+- Fixed incorrect return type on `_annotate_cross_column` in dataset profiler
+- Fixed type errors in `FeatureIQ.ablate()` and override transform construction
+
 ## [0.1.0] - 2024-12-01
 
 ### Added
