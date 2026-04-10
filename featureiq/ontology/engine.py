@@ -137,7 +137,7 @@ def get_applicable_rules(
     results = []
     for adj_conf, rule in applicable:
         if adj_conf != rule.confidence:
-            rule = rule.model_copy(update={"confidence": adj_conf})  # type: ignore[attr-defined]
+            rule = rule.model_copy(update={"confidence": adj_conf})
         results.append(rule)
     return results
 
