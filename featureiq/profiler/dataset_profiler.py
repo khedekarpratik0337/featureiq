@@ -174,7 +174,11 @@ def _compute_vif_scores(
 def _annotate_cross_column(
     X: pd.DataFrame,
     column_profiles: dict[str, ColumnProfile],
-) -> None:
+) -> tuple[
+    dict[str, dict[str, float]],
+    list[tuple[str, str, float]],
+    dict[str, float],
+]:
     """Annotate column profiles with cross-column awareness fields."""
     corr_dict, pairs = _compute_correlation_matrix(X, column_profiles)
     vif_scores = _compute_vif_scores(X, column_profiles)
@@ -191,7 +195,7 @@ def _annotate_cross_column(
         if name in vif_scores and vif_scores[name] > 10.0:
             cp.has_high_vif = True
 
-    return corr_dict, pairs, vif_scores  # type: ignore[return-value]
+    return corr_dict, pairs, vif_scores
 
 
 def profile_dataset(

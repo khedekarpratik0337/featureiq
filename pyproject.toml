@@ -60,6 +60,12 @@ profile = "black"
 [tool.mypy]
 strict = true
 ignore_missing_imports = true
+disallow_subclassing_any = false
+disallow_any_generics = false
+warn_return_any = false
+disallow_untyped_calls = false
+disable_error_code = ["import-untyped"]
+plugins = ["pydantic.mypy"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

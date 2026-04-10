@@ -16,7 +16,7 @@ from featureiq.exceptions import (
     UnsupportedProblemTypeError,
 )
 from featureiq.ontology.engine import OntologyEngine
-from featureiq.ontology.rule_loader import OntologyRule
+from featureiq.ontology.rule_loader import OntologyRule, RuleCondition
 from featureiq.profiler.dataset_profiler import DatasetProfile, profile_dataset
 from featureiq.profiler.meta_features import build_meta_feature_vector
 from featureiq.recommender.fallback import ontology_only_recommend
@@ -194,7 +194,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
                         high_score = {t for t, s in scored if s > 0.6}
 
                         for col_name, rules in self.recommendations_.items():
-                            boosted = []
+                            boosted: list[OntologyRule] = []
                             for rule in rules:
                                 if rule.transformation in high_score:
                                     boosted.insert(0, rule)
@@ -229,7 +229,7 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
                             id=f"OVERRIDE_{col}_{t_name}",
                             description=f"User override: {t_name} for {col}",
                             version="1.0",
-                            conditions={},
+                            conditions=RuleCondition(),
                             algorithm_families=[af],
                             transformation=t_name,
                             contraindicated_for=[],
@@ -415,7 +415,11 @@ class FeatureIQ(BaseEstimator, TransformerMixin):
         from sklearn.base import clone
         from sklearn.model_selection import cross_val_score
 
-        if not self.is_fitted_ or self.recommendations_ is None:
+        if (
+            not self.is_fitted_
+            or self.recommendations_ is None
+            or self.profile_ is None
+        ):
             raise FeatureIQError("FeatureIQ has not been fitted. Call fit() first.")
 
         full_pipe = build_pipeline(
