@@ -1,9 +1,9 @@
 # FeatureIQ
 
 [![CI](https://github.com/khedekarpratik0337/featureiq/actions/workflows/ci.yml/badge.svg)](https://github.com/khedekarpratik0337/featureiq/actions/workflows/ci.yml)
-[![PyPI](https://img.shields.io/pypi/v/featureiq.svg)](https://pypi.org/project/featureiq/)
+[![PyPI](https://img.shields.io/pypi/v/featureiq)](https://pypi.org/project/featureiq/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Python](https://img.shields.io/pypi/pyversions/featureiq.svg)](https://pypi.org/project/featureiq/)
+[![Python](https://img.shields.io/pypi/pyversions/featureiq)](https://pypi.org/project/featureiq/)
 
 **A knowledge graph and meta-learning framework for context-aware automated feature engineering.**
 
