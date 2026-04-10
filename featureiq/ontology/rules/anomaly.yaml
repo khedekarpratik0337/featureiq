@@ -1,0 +1,87 @@
+rules:
+  - id: "AD_001"
+    description: "Robust scaling (median/IQR) for distance-based anomaly detection"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "distance_based"
+    transformation: "robust_scaler"
+    contraindicated_for: []
+    confidence: 0.90
+    source: "Aggarwal, Outlier Analysis, Springer, 2017"
+    tags: ["anomaly_detection", "scaling", "robust", "distance_based"]
+
+  - id: "AD_002"
+    description: "Standard scaling for tree-based anomaly detection models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "tree_based"
+    transformation: "standard_scaler"
+    contraindicated_for: []
+    confidence: 0.65
+    source: "Liu et al., Isolation Forest, ICDM, 2008"
+    tags: ["anomaly_detection", "scaling", "tree_based"]
+
+  - id: "AD_003"
+    description: "One-hot encoding for categoricals in distance-based anomaly detection"
+    version: "1.0"
+    conditions:
+      column_type: "categorical"
+      is_high_cardinality: false
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "distance_based"
+      - "neural_network"
+    transformation: "one_hot_encoder"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "Aggarwal, Outlier Analysis, Springer, 2017"
+    tags: ["anomaly_detection", "encoding", "categorical", "distance_based"]
+
+  - id: "AD_004"
+    description: "Mean imputation for numerical columns in anomaly detection"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      has_missing: true
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "median_imputer"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "Aggarwal, Outlier Analysis, Springer, 2017"
+    tags: ["anomaly_detection", "imputation", "missing"]
+
+  - id: "AD_005"
+    description: "Mode imputation for categorical columns in anomaly detection"
+    version: "1.0"
+    conditions:
+      column_type: "categorical"
+      has_missing: true
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "mode_imputer"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Aggarwal, Outlier Analysis, Springer, 2017"
+    tags: ["anomaly_detection", "imputation", "categorical", "missing"]

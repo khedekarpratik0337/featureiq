@@ -1,0 +1,136 @@
+rules:
+  - id: "NUM_001"
+    description: "Apply log transform to skewed numerical features for linear models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      is_skewed: true
+      has_missing: false
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+    transformation: "log_transform"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "Kuhn & Johnson, Applied Predictive Modeling, 2013"
+    tags: ["numerical", "skewness", "linear"]
+
+  - id: "NUM_002"
+    description: "Standard scaling for distance-based and linear models"
+    version: "1.1"
+    conditions:
+      column_type: "numerical"
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "standard_scaler"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.95
+    source: "scikit-learn documentation, StandardScaler"
+    tags: ["numerical", "scaling"]
+    not_recommended_for: ["lasso"]
+
+  - id: "NUM_003"
+    description: "Mean imputation for numerical columns with low skewness"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      has_missing: true
+      is_skewed: false
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "mean_imputer"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Little & Rubin, Statistical Analysis with Missing Data, 2002"
+    tags: ["numerical", "imputation", "missing"]
+
+  - id: "NUM_004"
+    description: "Median imputation for numerical columns with high skewness"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      has_missing: true
+      is_skewed: true
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "median_imputer"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "Little & Rubin, Statistical Analysis with Missing Data, 2002"
+    tags: ["numerical", "imputation", "missing", "skewness"]
+
+  - id: "NUM_005"
+    description: "Outlier capping via IQR for linear and distance-based models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "iqr_clipper"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.70
+    source: "Tukey, Exploratory Data Analysis, 1977"
+    tags: ["numerical", "outlier", "clipping"]
+
+  - id: "NUM_006"
+    description: "Min-max scaling for neural network models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    algorithm_families:
+      - "neural_network"
+    transformation: "min_max_scaler"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.80
+    source: "Goodfellow et al., Deep Learning, 2016"
+    tags: ["numerical", "scaling", "neural_network"]
+
+  - id: "NUM_007"
+    description: "Polynomial features (degree 2) for linear models only"
+    version: "1.1"
+    conditions:
+      column_type: "numerical"
+    algorithm_families:
+      - "linear_model"
+    transformation: "polynomial_features"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.65
+    source: "Hastie et al., Elements of Statistical Learning, 2009"
+    tags: ["numerical", "polynomial", "linear"]
+    preferred_for: ["linear_regression"]
+    not_recommended_for: ["lasso", "ridge"]
+
+  - id: "NUM_008"
+    description: "Log transform of skewed numerical features for neural networks"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      is_skewed: true
+      has_missing: false
+    algorithm_families:
+      - "neural_network"
+    transformation: "log_transform"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Goodfellow et al., Deep Learning, 2016"
+    tags: ["numerical", "skewness", "neural_network"]

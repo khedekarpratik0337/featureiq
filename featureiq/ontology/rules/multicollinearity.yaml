@@ -1,0 +1,36 @@
+rules:
+  - id: "MCL_001"
+    description: "For linear models, recommend dropping one of two highly correlated features to reduce multicollinearity"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      is_highly_correlated: true
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "standard_scaler"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.75
+    source: "Dormann et al., Collinearity: a review of methods to deal with it, Ecography, 2013"
+    tags: ["numerical", "multicollinearity", "correlation"]
+
+  - id: "MCL_002"
+    description: "For linear models with high VIF, recommend dimensionality reduction or feature removal"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+      has_high_vif: true
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "standard_scaler"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.70
+    source: "James et al., An Introduction to Statistical Learning, 2013"
+    tags: ["numerical", "multicollinearity", "vif"]

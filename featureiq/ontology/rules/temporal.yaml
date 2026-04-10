@@ -1,0 +1,107 @@
+rules:
+  - id: "TMP_001"
+    description: "Lag feature generation for time series forecasting"
+    version: "1.1"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "lag_feature_generator"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["temporal", "lag", "time_series"]
+
+  - id: "TMP_002"
+    description: "Rolling mean and rolling std features for time series forecasting"
+    version: "1.1"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "rolling_stats_generator"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["temporal", "rolling", "time_series"]
+
+  - id: "TMP_003"
+    description: "Date component extraction (year, month, day, weekday, hour) for classification and regression"
+    version: "1.0"
+    conditions:
+      column_type: "datetime"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "date_component_extractor"
+    contraindicated_for: []
+    confidence: 0.90
+    source: "Zheng & Casari, Feature Engineering for Machine Learning, O'Reilly, 2018"
+    tags: ["temporal", "date_components", "extraction"]
+
+  - id: "TMP_004"
+    description: "Time since reference point (days since first date) for regression and classification"
+    version: "1.1"
+    conditions:
+      column_type: "datetime"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "time_since_reference"
+    contraindicated_for: []
+    confidence: 0.75
+    source: "Kuhn & Johnson, Feature Engineering and Selection, 2019"
+    tags: ["temporal", "time_since", "reference"]
+
+  - id: "TMP_005"
+    description: "First-order differencing to achieve stationarity for linear time-series models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "linear_model"
+    transformation: "differencing"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.75
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["temporal", "differencing", "stationarity", "time_series"]
+
+  - id: "TMP_006"
+    description: "Fourier features (sin/cos) for capturing seasonality in linear models"
+    version: "1.0"
+    conditions:
+      column_type: "numerical"
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "linear_model"
+      - "neural_network"
+    transformation: "fourier_features"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.70
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["temporal", "fourier", "seasonality", "time_series"]

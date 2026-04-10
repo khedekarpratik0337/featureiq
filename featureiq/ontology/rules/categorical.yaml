@@ -1,0 +1,116 @@
+rules:
+  - id: "CAT_001"
+    description: "One-hot encoding for low cardinality categorical features"
+    version: "1.1"
+    conditions:
+      column_type: "categorical"
+      cardinality_level: "low"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "one_hot_encoder"
+    contraindicated_for: []
+    confidence: 0.90
+    source: "scikit-learn documentation, OneHotEncoder"
+    tags: ["categorical", "encoding", "low_cardinality"]
+    not_recommended_for: ["lightgbm", "xgboost"]
+
+  - id: "CAT_002"
+    description: "Target encoding for medium/high cardinality categoricals with tree-based models"
+    version: "1.1"
+    conditions:
+      column_type: "categorical"
+    algorithm_families:
+      - "tree_based"
+      - "ensemble"
+    transformation: "target_encoder"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Micci-Barreca, A Preprocessing Scheme for High-Cardinality Categorical Attributes, SIGKDD Explorations, 2001"
+    tags: ["categorical", "encoding", "high_cardinality", "tree_based"]
+
+  - id: "CAT_003"
+    description: "Ordinal encoding for ordinal categorical features"
+    version: "1.0"
+    conditions:
+      column_type: "categorical"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "ordinal_encoder"
+    contraindicated_for: []
+    confidence: 0.70
+    source: "Kuhn & Johnson, Applied Predictive Modeling, 2013"
+    tags: ["categorical", "encoding", "ordinal"]
+
+  - id: "CAT_004"
+    description: "Rare label grouping for high cardinality features"
+    version: "1.1"
+    conditions:
+      column_type: "categorical"
+      cardinality_level: "high"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "rare_label_grouper"
+    contraindicated_for: []
+    confidence: 0.75
+    source: "Kuhn & Johnson, Feature Engineering and Selection, 2019"
+    tags: ["categorical", "rare_labels", "cardinality"]
+
+  - id: "CAT_005"
+    description: "Missing value imputation with mode for categorical columns"
+    version: "1.0"
+    conditions:
+      column_type: "categorical"
+      has_missing: true
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "mode_imputer"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Little & Rubin, Statistical Analysis with Missing Data, 2002"
+    tags: ["categorical", "imputation", "missing"]
+
+  - id: "CAT_006"
+    description: "Binary encoding for medium/high cardinality features with linear and distance-based models"
+    version: "1.1"
+    conditions:
+      column_type: "categorical"
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+    transformation: "binary_encoder"
+    contraindicated_for: []
+    confidence: 0.75
+    source: "Zheng & Casari, Feature Engineering for Machine Learning, O'Reilly, 2018"
+    tags: ["categorical", "encoding", "high_cardinality", "binary"]
+
+  - id: "CAT_007"
+    description: "One-hot encoding for medium cardinality categoricals in linear/distance-based models"
+    version: "1.0"
+    conditions:
+      column_type: "categorical"
+      cardinality_level: "medium"
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+    transformation: "one_hot_encoder"
+    contraindicated_for:
+      - "tree_based"
+    confidence: 0.75
+    source: "scikit-learn documentation, OneHotEncoder"
+    tags: ["categorical", "encoding", "medium_cardinality"]

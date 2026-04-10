@@ -1,0 +1,98 @@
+rules:
+  - id: "TGT_001"
+    description: "Log transform of target variable for regression with skewed target"
+    version: "1.0"
+    conditions:
+      is_skewed: true
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "log_transform"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Kuhn & Johnson, Applied Predictive Modeling, 2013"
+    tags: ["target", "regression", "skewness", "log"]
+
+  - id: "TGT_002"
+    description: "Class weight balancing for imbalanced binary classification"
+    version: "1.0"
+    conditions: {}
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "class_weight_balancing"
+    contraindicated_for: []
+    confidence: 0.85
+    source: "He & Garcia, Learning from Imbalanced Data, IEEE TKDE, 2009"
+    tags: ["target", "classification", "imbalanced", "class_weight"]
+
+  - id: "TGT_003"
+    description: "Stratified sampling flag for imbalanced multiclass classification"
+    version: "1.0"
+    conditions: {}
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "stratified_sampling"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "He & Garcia, Learning from Imbalanced Data, IEEE TKDE, 2009"
+    tags: ["target", "classification", "imbalanced", "stratified"]
+
+  - id: "TGT_004"
+    description: "Log transform of skewed target for time-series forecasting"
+    version: "1.0"
+    conditions:
+      is_skewed: true
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+    transformation: "log_transform"
+    contraindicated_for: []
+    confidence: 0.80
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["target", "forecasting", "skewness", "log"]
+
+  - id: "TGT_005"
+    description: "Differencing recommendation for non-stationary target in forecasting"
+    version: "1.0"
+    conditions: {}
+    problem_types:
+      - "time_series_forecasting"
+    algorithm_families:
+      - "linear_model"
+    transformation: "differencing"
+    contraindicated_for:
+      - "tree_based"
+      - "ensemble"
+    confidence: 0.75
+    source: "Hyndman & Athanasopoulos, Forecasting: Principles and Practice, 3rd ed., 2021"
+    tags: ["target", "forecasting", "differencing", "stationarity"]
+
+  - id: "TGT_006"
+    description: "Contamination ratio calibration for semi-supervised anomaly detection"
+    version: "1.0"
+    conditions: {}
+    problem_types:
+      - "anomaly_detection"
+    algorithm_families:
+      - "tree_based"
+      - "linear_model"
+      - "distance_based"
+      - "neural_network"
+      - "ensemble"
+    transformation: "contamination_calibration"
+    contraindicated_for: []
+    confidence: 0.75
+    source: "Liu et al., Isolation Forest, ICDM, 2008"
+    tags: ["target", "anomaly_detection", "contamination", "calibration"]
